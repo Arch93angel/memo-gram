@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+.shift-group {
+    position: relative;
+}
+.shift-input:placeholder-shown + .shift-label  {
+  visibility:hidden
+}
+.shift-input:focus + .shift-label,
+.shift-input + .shift-label {
+  /* no value in input */
+  position: absolute;
+  left: 10px;
+  top: -10px;
+  font-size: 12px;
+  background-color: white;
+  padding-left: 10px;
+  padding-right: 10px;
+  visibility:visible
+}
+.shift-input:focus::placeholder {
+  visibility:hidden
+}
