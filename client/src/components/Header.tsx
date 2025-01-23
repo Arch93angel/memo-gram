@@ -8,7 +8,7 @@ function Header({}: Props) {
         <img className="w-[70px] drop-shadow cursor-pointer" 
             src="https://res.cloudinary.com/dfogh1n6r/image/upload/v1737123786/logo-removebg_pau6es.png" alt="logo" />
         <div className="flex">
-            <Button text="Add New TaskBoard" secondary/>
+            <Button text="Add New Memory" secondary/>
         </div>
     </div>
   )
