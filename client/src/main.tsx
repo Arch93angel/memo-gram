@@ -3,9 +3,12 @@ import { createRoot } from 'react-dom/client'
 import './assets/index.css'
 import App from './App.tsx'
 import { ToastContainer, Flip} from 'react-toastify';
+import { Provider } from 'react-redux';
+import { store } from './redux/store.ts';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
+    <Provider store={store}>
     <App />
     <ToastContainer
         position="top-center"
@@ -20,5 +23,6 @@ createRoot(document.getElementById('root')!).render(
         theme="light"
         transition={Flip}
       />
+      </Provider>
   </StrictMode>,
 )

@@ -1,33 +1,61 @@
-import { createSlice } from '@reduxjs/toolkit'
-import type { PayloadAction } from '@reduxjs/toolkit'
-import type { RootState } from './store'
+// features/apiSlice.ts
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import axios from 'axios';
 
-
-interface StoryState {
-  value: {}
+interface PostData {
+  username: string;
+  email: string;
 }
 
-const initialState: StoryState = {
-  value: {},
+interface ApiState {
+  loading: boolean;
+  data: any;
+  error: string | null;
 }
 
-export const storiesSlice = createSlice({
-  name: 'story',
-  // `createSlice` will infer the state type from the `initialState` argument
+const initialState: ApiState = {
+  loading: false,
+  data: null,
+  error: null,
+};
+
+// Async thunk for POST request
+export const createStory = createAsyncThunk(
+  'api/stories',
+  async (postData: PostData, { rejectWithValue }) => {
+    try {
+      const response = await axios.post('http://localhost:8000/api/stories/', postData, {
+        headers: { 
+          'Content-Type': 'application/json'
+          
+         },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
+  }
+);
+
+const storySlice = createSlice({
+  name: 'api',
   initialState,
-  reducers: {
-    setStories:(state,action)=>{
-        state.value = action.payload 
-    },
-    // Use the PayloadAction type to declare the contents of `action.payload`
-    
-    },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(createStory.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createStory.fulfilled, (state, action) => {
+        state.loading = false;
+        state.data = action.payload;
+      })
+      .addCase(createStory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
   },
-)
+});
 
-export const { setStories } = storiesSlice.actions
-
-// Other code such as selectors can use the imported `RootState` type
-
-
-export default storiesSlice.reducer
+export default storySlice.reducer;

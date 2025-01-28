@@ -3,8 +3,8 @@ import { toastError, toastInfo } from "./toast"
 
 const catchError =(error:{code?:string})=>{
     const {code} = error
-    if (code === "auth/invalid-email") {
-        toastError("Invalid Email")
+    if (code === "HTTP_400_BAD_REQUEST") {
+        toastError("User Not Found")
     } else if(code === "auth/weak-password"){
         toastError("Password should be atleast 6 characters")
     } else if(code === "auth/user-not-found"){
