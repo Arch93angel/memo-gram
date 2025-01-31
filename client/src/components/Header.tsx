@@ -3,15 +3,18 @@ import Button from "./Button";
 import { useNavigate } from 'react-router-dom';
 import { AppDispatch } from '../redux/store';
 import { useDispatch } from "react-redux";
+import { useState } from "react";
 
 
 
 
 function Header() {
+  const [login, setLogin] = useState(true);
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   
   const handleSignOut =()=>{
+    setLogin(false);
     dispatch(logout());
     navigate('/auth');
   }
@@ -22,7 +25,15 @@ function Header() {
             src="https://res.cloudinary.com/dfogh1n6r/image/upload/v1737123786/logo-removebg_pau6es.png" alt="logo" />
         <div className="flex gap-2">
             <Button text="Add New Memory" secondary/>
-            <Button text='Log out' onClick={handleSignOut}/>
+            {login ? (
+                  <>
+                    <Button text='Log Out' onClick={handleSignOut} loading={false} />
+                  </>
+                ):(
+                  <>
+                    <Button text='Log In'/>
+                  </>
+                )}
         </div>
     </div>
   )

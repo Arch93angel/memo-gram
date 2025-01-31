@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import Button from './Button'
 import Input from './input'
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, } from 'react-router-dom';
 // import { authDataType } from '../types/Types';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../redux/store';
-import { registerUser, loginUser } from '../redux/authSlice';
+import { registerUser, loginUser, setToken} from '../redux/authSlice';
 import catchError from "../utils/catchError";
+
 
 
 
@@ -22,6 +23,10 @@ const Login = () => {
     const [signInLoading, setSignInLoading] = useState(false);
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>()
+    
+    
+    
+    
 
 
   
@@ -32,6 +37,7 @@ const Login = () => {
         dispatch(registerUser({ username, password, email, confirmPassword }))
         .unwrap()
         .then(() => {
+          
           navigate('/dashboard'); // Navigate to login page after successful registration
       }).catch(error => {
           catchError(error);
@@ -46,7 +52,8 @@ const Login = () => {
         dispatch(loginUser({ username, password }))
         .unwrap()
         .then(() => {
-          navigate('/dashboard'); // Navigate to dashboard after successful login
+          navigate('/dashboard', { replace: true }); // Navigate to dashboard after successful login
+          
       }).catch(error => {
           catchError(error);
           setSignInLoading(false)
@@ -91,3 +98,5 @@ const Login = () => {
 }
 
 export default Login
+
+

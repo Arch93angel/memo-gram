@@ -1,7 +1,9 @@
 // features/authSlice.ts
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { toastError, toastInfo, toastSuccess } from '../utils/toast';
+import { toastError, toastInfo, toastSuccess, toastWarning } from '../utils/toast';
+
+
 
 interface AuthState {
   user: string | null;
@@ -12,11 +14,10 @@ interface AuthState {
 
 const initialState: AuthState = {
   user: null,
-  token: null,
+  token: localStorage.getItem("token") || null,
   loading: false,
   error: null,
 };
-
 
 
 // Register action
@@ -36,6 +37,7 @@ export const registerUser = createAsyncThunk(
           });
           
           toastSuccess("Registration Successful");
+           // Save token to localStorage
           return response.data;
           }else toastError("Password do not match..");
         
@@ -48,6 +50,7 @@ export const registerUser = createAsyncThunk(
 // Login action
 export const loginUser = createAsyncThunk(
   'auth/login',
+  
   async (
     { username, password}: { username: string; password: string },
     { rejectWithValue }
@@ -60,7 +63,6 @@ export const loginUser = createAsyncThunk(
           });
           toastSuccess("Login Successful");
           return response.data;
-        
       } else toastError("Fields should not be left empty..");
     } catch (error: any) {
       return rejectWithValue(error.response?.data || 'Login failed');
@@ -77,6 +79,11 @@ const authSlice = createSlice({
       state.token = null;
       localStorage.removeItem('token');
       toastInfo("Sign Out Successful")
+    },
+    setToken: (state, action: PayloadAction<string>) => {
+      state.user = action.payload;
+      state.token = action.payload;
+      localStorage.setItem('token', action.payload); // Store token in localStorage
     },
   },
   extraReducers: (builder) => {
@@ -100,9 +107,9 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.token = action.payload.access;
-        state.user = action.payload.refresh; // Replace with actual user info if provided
-        localStorage.setItem('token', action.payload.access);
+        state.token = action.payload || null; // Ensure token is updated
+        state.user = action.payload || null;
+        localStorage.setItem('token', action.payload);
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
@@ -111,6 +118,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout } = authSlice.actions;
+export const { logout, setToken } = authSlice.actions;
 
 export default authSlice.reducer;

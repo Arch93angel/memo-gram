@@ -1,61 +1,69 @@
-// features/apiSlice.ts
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
+import { Story } from "../types/Types";
+import { RootState } from "./store";
 
-interface PostData {
-  username: string;
-  email: string;
-}
 
-interface ApiState {
-  loading: boolean;
-  data: any;
-  error: string | null;
-}
 
-const initialState: ApiState = {
-  loading: false,
-  data: null,
-  error: null,
-};
+const API_URL = "http://localhost:8000/api/stories/";
 
-// Async thunk for POST request
-export const createStory = createAsyncThunk(
-  'api/stories',
-  async (postData: PostData, { rejectWithValue }) => {
+export const fetchStories = createAsyncThunk<Story[], undefined, { state: RootState }>(
+  "stories/fetchStories",
+  async (_, { rejectWithValue, getState }) => {
+    // Get the token from Redux state
+    const token = getState().auth.token;
+
+    // If no token, reject the request
+    if (!token) {
+      return rejectWithValue("Unauthorized: No token provided");
+    }
+
     try {
-      const response = await axios.post('http://localhost:8000/api/stories/', postData, {
-        headers: { 
-          'Content-Type': 'application/json'
-          
-         },
+      const response = await axios.get(API_URL, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Include token in Authorization header
+        },
       });
-      return response.data;
+
+      return response.data; // Return the response data
     } catch (error: any) {
-      return rejectWithValue(error.response?.data || 'Something went wrong');
+      return rejectWithValue(error.response?.data || "An error occurred");
     }
   }
 );
 
-const storySlice = createSlice({
-  name: 'api',
+interface storiesState {
+  stories: Story[];
+  status: "idle" | "loading" | "succeeded" | "failed";
+  error: string | null;
+}
+
+const initialState: storiesState = {
+  stories: [],
+  status: "idle",
+  error: null,
+};
+
+const storiesSlice = createSlice({
+  name: "stories",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(createStory.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+      .addCase(fetchStories.pending, (state) => {
+        state.status = "loading";
       })
-      .addCase(createStory.fulfilled, (state, action) => {
-        state.loading = false;
-        state.data = action.payload;
+      .addCase(fetchStories.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.stories = action.payload;
       })
-      .addCase(createStory.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
+      .addCase(fetchStories.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message || "Something went wrong";
       });
   },
 });
 
-export default storySlice.reducer;
+export default storiesSlice.reducer;
+
+

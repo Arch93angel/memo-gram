@@ -36,6 +36,8 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "daphne",  # Required for Django Channels
+    "channels",
     "django.contrib.staticfiles",
     'rest_framework',
     'rest_framework.authtoken',
@@ -80,6 +82,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "server.wsgi.application"
 
+# Set ASGI application
+ASGI_APPLICATION = "server.asgi.application"
+
+# WebSocket Channels Configuration
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",  # For development
+        # For production, use Redis:
+        # "BACKEND": "channels_redis.core.RedisChannelLayer",
+        # "CONFIG": {"hosts": [("127.0.0.1", 6379)]},
+    }
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases

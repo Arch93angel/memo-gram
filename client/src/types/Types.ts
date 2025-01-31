@@ -14,3 +14,14 @@ export type userType = {
     creationTime?: string;
     lastSeen?: string;
 }
+export interface Story {
+  author: string;
+  id: number;
+  caption: string;
+  image?: string;
+  likes?:number;
+  created_at?: string;
+  updated_at?: string;
+  tags?:string;
+}
+
